@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rainwater Harvesting Assessment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f7f9;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2, h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-step {
+      display: none;
+    }
+    .form-step.active {
+      display: block;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .btn {
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .results {
+      background: #eef9f1;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .steps-nav {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .steps-nav span {
+      display: inline-block;
+      margin: 0 5px;
+      padding: 6px 12px;
+      border-radius: 50%;
+      background: #ccc;
+      color: #fff;
+      font-weight: bold;
+    }
+    .steps-nav .active-step {
+      background: #007BFF;
+    }
+    p#location {
+      font-size: 14px;
+      font-style: italic;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Rainwater Harvesting Assessment</h2>
+
+    <!-- Navigation -->
+    <div class="steps-nav">
+      <span id="step1-nav" class="active-step">1</span>
+      <span id="step2-nav">2</span>
+      <span id="step3-nav">3</span>
+      <span id="step4-nav">4</span>
+    </div>
+
+    <!-- Step 1: Site Info -->
+    <div class="form-step active" id="step1">
+      <label>Site Name</label>
+      <input type="text" id="siteName" placeholder="Enter site name">
+
+      <label>GPS Coordinates</label>
+      <button class="btn" type="button" onclick="getLocation()">Get Current Location</button>
+      <p id="location">Coordinates will appear here</p>
+
+      <button class="btn" onclick="nextStep(1)">Next</button>
+    </div>
+
+    <!-- Step 2: Roof Details -->
+    <div class="form-step" id="step2">
+      <label>Roof Length (m)</label>
+      <input type="number" id="length" placeholder="e.g., 10">
+
+      <label>Roof Width (m)</label>
+      <input type="number" id="width" placeholder="e.g., 8">
+
+      <label>Roof Material</label>
+      <select id="material">
+        <option value="0.9">Concrete / Metal (Runoff Coefficient 0.9)</option>
+        <option value="0.8">Tiles (Runoff Coefficient 0.8)</option>
+        <option value="0.7">Asbestos (Runoff Coefficient 0.7)</option>
+        <option value="0.6">Soil / Grass (Runoff Coefficient 0.6)</option>
+      </select>
+
+      <button class="btn" onclick="prevStep(2)">Back</button>
+      <button class="btn" onclick="nextStep(2)">Next</button>
+    </div>
+
+    <!-- Step 3: Rainfall Data -->
+    <div class="form-step" id="step3">
+      <label>Average Annual Rainfall (mm)</label>
+      <input type="number" id="rainfall" placeholder="e.g., 800">
+
+      <button class="btn" onclick="prevStep(3)">Back</button>
+      <button class="btn" onclick="calculate()">Calculate</button>
+    </div>
+
+    <!-- Step 4: Results -->
+    <div class="form-step" id="step4">
+      <h3>Results</h3>
+      <div class="results" id="resultsBox">
+        <!-- Results will appear here -->
+      </div>
+      <button class="btn" onclick="prevStep(4)">Back</button>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    let gpsCoords = "";
+
+    function showStep(step) {
+      document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+      document.querySelector(#step${step}).classList.add('active');
+
+      document.querySelectorAll('.steps-nav span').forEach(el => el.classList.remove('active-step'));
+      document.querySelector(#step${step}-nav).classList.add('active-step');
+    }
+
+    function nextStep(step) {
+      currentStep = step + 1;
+      showStep(currentStep);
+    }
+
+    function prevStep(step) {
+      currentStep = step - 1;
+      showStep(currentStep);
+    }
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            let lat = position.coords.latitude.toFixed(6);
+            let lon = position.coords.longitude.toFixed(6);
+            gpsCoords = Lat: ${lat}, Lon: ${lon};
+            document.getElementById("location").innerText = gpsCoords;
+          },
+          function(error) {
+            document.getElementById("location").innerText = "Location access denied.";
+          }
+        );
+      } else {
+        document.getElementById("location").innerText = "Geolocation not supported.";
+      }
+    }
+
+    function calculate() {
+      let length = parseFloat(document.getElementById("length").value) || 0;
+      let width = parseFloat(document.getElementById("width").value) || 0;
+      let material = parseFloat(document.getElementById("material").value) || 0.8;
+      let rainfall = parseFloat(document.getElementById("rainfall").value) || 0;
+
+      let area = length * width; // m²
+      let volume = area * (rainfall/1000) * material; // m³
+      let liters = volume * 1000; // convert to liters
+
+      let results = `
+        <p><b>Site:</b> ${document.getElementById("siteName").value}</p>
+        <p><b>Coordinates:</b> ${gpsCoords || "Not captured"}</p>
+        <p><b>Roof Area:</b> ${area.toFixed(2)} m²</p>
+        <p><b>Potential Rainwater Harvesting:</b> ${liters.toFixed(2)} liters/year</p>
+        <p><b>Recommended Tank Size:</b> ${(liters/2).toFixed(2)} liters (approx.)</p>
+      `;
+      document.getElementById("resultsBox").innerHTML = results;
+      nextStep(3);
+    }
+  </script>
+</body>
+</html>
